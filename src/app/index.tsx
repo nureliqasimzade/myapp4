@@ -1,4 +1,5 @@
 import useProducts from "@/context/ProductsContext";
+import { router } from "expo-router";
 import { useEffect } from "react";
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -12,6 +13,13 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Products</Text>
+
+      <TouchableOpacity
+        style={styles.addBtn}
+        onPress={() => router.push("/add-product")}
+      >
+        <Text style={styles.addBtnText}>+ Add Product</Text>
+      </TouchableOpacity>
 
       <FlatList
         data={products}
@@ -37,6 +45,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
+  },
+  addBtn: {
+    backgroundColor: "skyblue",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  addBtnText: {
+    fontSize: 18,
+    fontWeight: "bold",
   },
   item: {
     padding: 15,
