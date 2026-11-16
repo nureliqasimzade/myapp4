@@ -10,6 +10,13 @@ export default function HomeScreen() {
     console.log(products);
   }, [products]);
 
+  const navigationHandler = (item: any) => {
+    router.push({
+      pathname: "/product-details",
+      params: { id: item.id },
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Products</Text>
@@ -25,7 +32,10 @@ export default function HomeScreen() {
         data={products}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.item}>
+          <TouchableOpacity
+            style={styles.item}
+            onPress={() => navigationHandler(item)}
+          >
             <Text style={styles.name}>{item.name}</Text>
             <Text style={styles.price}>{item.price} AZN</Text>
           </TouchableOpacity>

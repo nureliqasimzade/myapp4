@@ -11,6 +11,12 @@ export type Product = {
 type ProductsContextType = {
   products: Product[];
   addProduct: (name: string, price: number, description: string) => void;
+  updateProduct: (
+    id: string,
+    name: string,
+    price: number,
+    description: string,
+  ) => void;
 };
 
 const initialProducts: Product[] = [
@@ -56,8 +62,23 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
     setProducts((prev) => [...prev, newProduct]);
   };
 
+  const updateProduct = (
+    id: string,
+    name: string,
+    price: number,
+    description: string,
+  ) => {
+    setProducts((prev) =>
+      prev.map((product) =>
+        product.id === id
+          ? { ...product, name, price, description }
+          : product,
+      ),
+    );
+  };
+
   return (
-    <ProductsContext.Provider value={{ products, addProduct }}>
+    <ProductsContext.Provider value={{ products, addProduct, updateProduct }}>
       {children}
     </ProductsContext.Provider>
   );
