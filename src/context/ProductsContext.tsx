@@ -10,12 +10,18 @@ export type Product = {
 
 type ProductsContextType = {
   products: Product[];
-  addProduct: (name: string, price: number, description: string) => void;
+  addProduct: (
+    name: string,
+    price: number,
+    description: string,
+    imageUrl: string,
+  ) => void;
   updateProduct: (
     id: string,
     name: string,
     price: number,
     description: string,
+    imageUrl: string,
   ) => void;
 };
 
@@ -50,13 +56,18 @@ const ProductsContext = createContext<ProductsContextType | undefined>(
 export function ProductsProvider({ children }: { children: React.ReactNode }) {
   const [products, setProducts] = useState<Product[]>(initialProducts);
 
-  const addProduct = (name: string, price: number, description: string) => {
+  const addProduct = (
+    name: string,
+    price: number,
+    description: string,
+    imageUrl: string,
+  ) => {
     const newProduct: Product = {
       id: Date.now().toString(),
       name,
       price,
       description,
-      imageUrl: "",
+      imageUrl,
     };
 
     setProducts((prev) => [...prev, newProduct]);
@@ -67,11 +78,12 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
     name: string,
     price: number,
     description: string,
+    imageUrl: string,
   ) => {
     setProducts((prev) =>
       prev.map((product) =>
         product.id === id
-          ? { ...product, name, price, description }
+          ? { ...product, name, price, description, imageUrl }
           : product,
       ),
     );

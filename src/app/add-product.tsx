@@ -1,12 +1,17 @@
 import useProducts from "@/context/ProductsContext";
+import { File, Paths } from "expo-file-system";
+import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
 } from "react-native";
 
 export default function AddProductScreen() {
@@ -15,20 +20,58 @@ export default function AddProductScreen() {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+
+  const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Allow access to your photos");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (result.canceled) {
+      return;
+    }
+
+    const pickedFile = new File(result.assets[0].uri);
+    const newFile = new File(Paths.document, `${Date.now()}.jpg`);
+
+    pickedFile.copy(newFile);
+
+    setImageUrl(newFile.uri);
+  };
 
   const addHandler = () => {
     if (!name.trim() || !price.trim()) {
       return;
     }
 
-    addProduct(name, Number(price), description);
+    addProduct(name, Number(price), description, imageUrl);
 
     router.back();
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <Text style={styles.header}>New Product</Text>
+
+      <TouchableOpacity onPress={pickImage}>
+        {imageUrl ? (
+          <Image source={{ uri: imageUrl }} style={styles.image} />
+        ) : (
+          <Text style={styles.pickText}>Pick Image</Text>
+        )}
+      </TouchableOpacity>
 
       <TextInput
         style={styles.input}
@@ -59,7 +102,7 @@ export default function AddProductScreen() {
       <TouchableOpacity onPress={() => router.back()}>
         <Text style={styles.cancel}>Cancel</Text>
       </TouchableOpacity>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -75,6 +118,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 25,
   },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  pickText: {
+    fontSize: 18,
+    color: "blue",
+    marginBottom: 20,
+  },
   input: {
     borderWidth: 1,
     borderColor: "gray",
@@ -85,7 +139,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   btn: {
-    backgroundColor: "skyblue",
+    backgroundColor: Platform.select({
+      ios: "skyblue",
+      android: "springgreen",
+      default: "skyblue",
+    }),
     padding: 15,
     borderRadius: 8,
   },
